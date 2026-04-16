@@ -17,6 +17,7 @@ module Carts
     end
 
     def call
+      return Result.new(false, 'Cart not found', :not_found) if @cart.nil?
       return Result.new(false, 'Missing product_id or quantity', :unprocessable_entity) if @product_id.blank? || @quantity.nil?
       return Result.new(false, 'Invalid quantity', :unprocessable_entity) if @quantity <= 0
       return Result.new(false, 'Product not found', :not_found) unless Product.exists?(@product_id)

@@ -7,10 +7,12 @@ RSpec.describe Carts::AddItemService do
   describe '.call' do
     context 'when adding a new product' do
       it 'creates a new cart item' do
+        result = nil
         expect {
-          described_class.call(cart: cart, product_id: product.id, quantity: 2)
+          result = described_class.call(cart: cart, product_id: product.id, quantity: 2)
         }.to change(CartItem, :count).by(1)
 
+        expect(result).to be_success
         expect(cart.cart_items.first.quantity).to eq(2)
       end
     end
@@ -21,23 +23,27 @@ RSpec.describe Carts::AddItemService do
       end
 
       it 'updates the quantity of the existing item' do
+        result = nil
         expect {
-          described_class.call(cart: cart, product_id: product.id, quantity: 3)
+          result = described_class.call(cart: cart, product_id: product.id, quantity: 3)
         }.not_to change(CartItem, :count)
 
+        expect(result).to be_success
         expect(cart.cart_items.reload.first.quantity).to eq(4)
       end
     end
 
     context 'with invalid inputs' do
-      it 'returns false if quantity is zero' do
+      it 'returns a failure result if quantity is zero' do
         result = described_class.call(cart: cart, product_id: product.id, quantity: 0)
-        expect(result).to be_falsey
+        expect(result).not_to be_success
+        expect(result.error).to eq('Invalid quantity')
       end
 
-      it 'returns false if cart is missing' do
+      it 'returns a failure result if cart is missing' do
         result = described_class.call(cart: nil, product_id: product.id, quantity: 1)
-        expect(result).to be_falsey
+        expect(result).not_to be_success
+        expect(result.error).to eq('Cart not found')
       end
     end
   end
