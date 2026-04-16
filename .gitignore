@@ -34,4 +34,3 @@
 /coverage
 
 /config/database.yml
-/docker-compose.yml
