@@ -8,7 +8,15 @@ class Cart < ApplicationRecord
   scope :abandoned_candidates, -> { where(abandoned_at: nil).where("updated_at < ?", ABANDONED_THRESHOLD.ago) }
   scope :removable_abandoned, -> { where("abandoned_at < ?", REMOVABLE_THRESHOLD.ago) }
 
-  def total_price
-    cart_items.inject(0) { |sum, item| sum + item.total_price }
+  before_validation :set_default_total_price, on: :create
+
+  def update_total_price!
+    update!(total_price: cart_items.reload.sum(&:total_price))
+  end
+
+  private
+
+  def set_default_total_price
+    self.total_price ||= 0.0
   end
 end

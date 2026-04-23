@@ -25,6 +25,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_06_29_160041) do
   end
 
   create_table "carts", force: :cascade do |t|
+    t.decimal "total_price", precision: 17, scale: 2
     t.datetime "abandoned_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
